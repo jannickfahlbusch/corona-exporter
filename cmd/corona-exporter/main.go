@@ -4,10 +4,13 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"time"
+
+	"pkg.jf-projects.de/corona-exporter/pkg/gatherer/bing"
+	"pkg.jf-projects.de/corona-exporter/pkg/gatherer/interaktivmorgenpost"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"pkg.jf-projects.de/corona-exporter/pkg/gatherer"
 )
 
 var addr = flag.String("listen-address", ":8080", "The address to listen on for HTTP requests.")
@@ -15,7 +18,7 @@ var addr = flag.String("listen-address", ":8080", "The address to listen on for 
 func main() {
 	flag.Parse()
 
-	go gatherer.Gather()
+	go startGatherers()
 
 	// Expose the registered metrics via HTTP.
 	http.Handle("/metrics", promhttp.HandlerFor(
@@ -27,4 +30,13 @@ func main() {
 	))
 	log.Fatal(http.ListenAndServe(*addr, nil))
 
+}
+
+func startGatherers() {
+	httpClient := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	go bing.NewBingGatherer(httpClient).Gather()
+	go interaktivmorgenpost.NewInteraktivMorgenpost(httpClient).Gather()
 }

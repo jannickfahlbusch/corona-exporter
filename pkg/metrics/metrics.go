@@ -25,7 +25,7 @@ var (
 			Subsystem: Cases,
 			Name:      "per_country",
 			Help:      "Corona Cases by Country and type (Confirmed, Recovered, Ceased)",
-		}, []string{"country", "type"})
+		}, []string{"source", "country", "type"})
 
 	CasesTotal = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -33,7 +33,7 @@ var (
 			Subsystem: Cases,
 			Name:      "total",
 			Help:      "Corona Cases in total by type (Confirmed, Recovered, Ceased)",
-		}, []string{"type"})
+		}, []string{"source", "type"})
 )
 
 func init() {
